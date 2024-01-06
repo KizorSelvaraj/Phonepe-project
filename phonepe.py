@@ -14,7 +14,7 @@ database = psycopg2.connect(host= "localhost",
                                         port = 5432)
 cursor = database.cursor()
 
-query1='''select * from ag_trans'''
+query1='''select * from agre_trans'''
 cursor.execute(query1)
 database.commit()
 d1=cursor.fetchall()
@@ -109,6 +109,9 @@ top_use.States=top_use.States.str.title()
 top_use['States']=top_use['States'].replace(['Andaman-&-Nicobar-Islands'],'Andaman & Nicobar')
 top_use['States']=top_use['States'].replace(['Dadra-&-Nagar-Haveli-&-Daman-&-Diu'],'Dadra and Nagar Haveli and Daman and Diu')
 top_use['States']=top_use['States'].str.replace('-',' ')
+
+
+
 #INDIA MAP PLOTTING
 def geo_ta():
     url = "https://gist.githubusercontent.com/jbrobst/56c13bbbf9d97d187fea01ca62ea5112/raw/e388c4cae20aa53cb5090210a42ebb9b765c0a36/india_states.geojson"
@@ -375,6 +378,16 @@ def qus9():
     return st.plotly_chart(fig_brd)
 
 def qus10():
+    brand= map_tran[["district","transaction_amount"]]
+    brand1= brand.groupby("district")["transaction_amount"].sum().sort_values(ascending=False)
+    brand2= pd.DataFrame(brand1).reset_index().head(20)
+
+    fig_brd= px.bar(brand2, x= "district", y= "transaction_amount", color_discrete_sequence=px.colors.sequential.Oranges_r,
+                       title= "DISTRICTS TO HIGHEST TRANSACTION")
+    return st.plotly_chart(fig_brd)
+
+
+def qus11():
     brand= agre_use[["brand","transaction_count"]]
     brand1= brand.groupby("brand")["transaction_count"].sum().sort_values(ascending=False)
     brand2= pd.DataFrame(brand1).reset_index()
@@ -383,9 +396,10 @@ def qus10():
                        title= "Top Mobile Brands and Transaction_count")
     return st.plotly_chart(fig_brd)
 
+
 st.set_page_config(layout="wide")
 
-st.header(":violet[PHONEPE DATA VISUALIZATION AND EXPLORAION]")
+st.header(":violet[PHONEPE DATA VISUALIZATION AND EXPLORATION]")
 st.caption(":violet[India's Leading Digital Payment And Banking Service Provider]")
 tab1,tab2,tab3=st.tabs(["***HOME***","***DATA VISUALIZATION***","***TOP DATA***"])
 
@@ -490,7 +504,8 @@ with tab3:
     on4=st.toggle("DISTRICTS HAVING LOWEST TRANSACTION AMOUNT")
     if on4:
         qus9()
+        qus10()
     on5=st.toggle("TOP MOBILE AND THIER TRANSACTION")
     if on5:
-        qus10()
+        qus11()
         
